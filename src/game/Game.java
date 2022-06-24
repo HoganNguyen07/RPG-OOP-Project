@@ -1,3 +1,4 @@
+package game;
 import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.image.BufferStrategy;
@@ -7,6 +8,7 @@ import display.Display;
 import gfx.Assets;
 import gfx.ImageLoader;
 import gfx.SpriteSheet;
+import input.KeyManager;
 import states.GameState;
 import states.MenuState;
 import states.State;
@@ -29,19 +31,25 @@ public class Game implements Runnable
 	private State gameState;
 	private State menuState;
 	
+	//Input
+	
+	private KeyManager keyManager;
+	
 	public Game(String title, int width, int height)
 	{
 		this.width = width;
 		this.height = height;
 		this.title = title;
+		keyManager = new KeyManager();
 	}
 	
 	private void init() // Initialize all the Game's Graphics
 	{
 		display = new Display(title, width, height);
+		display.getFrame().addKeyListener(keyManager);
 		Assets.init();
-		gameState = new GameState();
-		menuState = new MenuState();
+		gameState = new GameState(this);
+		menuState = new MenuState(this);
 		State.setState(gameState);
 	}
 	
@@ -49,6 +57,8 @@ public class Game implements Runnable
 	
 	private void tick() // Update everything
 	{
+		keyManager.tick();
+		
 		if(State.getState() != null)
 		{
 			State.getState().tick();
@@ -87,34 +97,38 @@ public class Game implements Runnable
 		double delta = 0;
 		long now;
 		long lastTime = System.nanoTime();
-		long timer = 0;
-		int ticks = 0;
+//		long timer = 0;
+//		int ticks = 0;
 		
 		while(running)
 		{
 			now = System.nanoTime();
 			delta += (now - lastTime) / timePerTick;
-			timer += now - lastTime;
+//			timer += now - lastTime;
 			lastTime = now;
 			if(delta >= 1) 
 			{
 				tick();
 				render();
-				ticks++;
+//				ticks++;
 				delta--;
 			}
 			
-			if(timer >= 1000000000)
-			{
-				System.out.println("Ticks ans Frames: " + ticks);
-				ticks = 0;
-				timer = 0;
-			}
+//			if(timer >= 1000000000)
+//			{
+//				System.out.println("Ticks ans Frames: " + ticks);
+//				ticks = 0;
+//				timer = 0;
+//			}
 		}
 		
 		stop();
 	}
 	
+	public KeyManager getKeyManager()
+	{
+		return keyManager;
+	}
 	public synchronized void start() // Start up Thread
 	{
 		if(running)

@@ -3,14 +3,16 @@ package states;
 import java.awt.Graphics;
 
 import entity.creatures.Player;
+import game.Game;
 import gfx.Assets;
 
 public class GameState extends State
 {
 	private Player player;
-	public GameState()
+	public GameState(Game game)
 	{
-		player = new Player(100, 100);
+		super(game);
+		player = new Player(game, 100, 100);
 	}
 	
 	@Override
